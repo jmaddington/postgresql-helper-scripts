@@ -2,6 +2,11 @@
 
 # Update package list
 apt-get update
+apt-get install -y apt-utils
+
+echo "If you see a message: "
+echo "debconf: delaying package configuration, since apt-utils is not installed"
+echo "ctrl+c and run the script again."
 
 # Install wget if not installed
 if ! command -v wget &> /dev/null; then
