@@ -30,7 +30,8 @@ if ! pg_dump -V 2>&1 | grep -q "15"; then
   echo "pg_dump is not installed or is not version 15."
   read -p "Do you want to install PostgreSQL 15? [y/N]: " -r response
   if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
-    ./install-postgresql15.sh
+    pwd=$(pwd)
+    $pwd/install-postgresql15.sh
     # Re-check the version after installation
     pg_dump_version=$(pg_dump -V | grep -o '[0-9]*\.[0-9]*' | head -1)
     if [[ "$pg_dump_version" == "15"* ]]; then

@@ -37,7 +37,8 @@ if [ ! -x "$(command -v psql)" ] || [[ "$psql_version" != "15"* ]]; then
   echo "psql is not installed or is not version 15."
   read -p "Do you want to install PostgreSQL 15? [y/N]: " -r response
   if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
-    ./install-postgresql15.sh
+    pwd=$(pwd)
+    $pwd/install-postgresql15.sh
     if [[ "$psql_version" == "15"* ]]; then
       echo "PostgreSQL 15 installed successfully."
     else
