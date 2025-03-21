@@ -31,24 +31,26 @@ while [[ "$#" -gt 0 ]]; do
   shift
 done
 
-# Check if psql is installed and the version is 15
+# Check if psql is installed and the version is compatible (15 or 16)
+if [ ! -x "$(command -v psql)" ]; then
+  echo "ERROR: psql is not installed."
+  exit 1
+fi
+
 psql_version=$(psql -V | grep -o '[0-9]*\.[0-9]*' | head -1)
-if [ ! -x "$(command -v psql)" ] || [[ "$psql_version" != "15"* ]]; then
-  echo "psql is not installed or is not version 15."
-  read -p "Do you want to install PostgreSQL 15? [y/N]: " -r response
-  if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
-    pwd=$(pwd)
-    $pwd/install-postgresql15.sh
-    if [[ "$psql_version" == "15"* ]]; then
-      echo "PostgreSQL 15 installed successfully."
-    else
-      echo "Failed to install PostgreSQL 15."
-      exit 1
-    fi
-  else
-    echo "PostgreSQL 15 installation aborted."
+if [[ "$psql_version" == "15"* ]]; then
+  echo "PostgreSQL 15 detected."
+elif [[ "$psql_version" == "16"* ]]; then
+  echo "PostgreSQL 16 detected."
+else
+  echo "WARNING: Unsupported PostgreSQL version $psql_version detected."
+  echo "This script is designed to work with PostgreSQL 15 or 16."
+  read -p "Do you want to continue anyway? [y/N]: " -r response
+  if [[ ! "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+    echo "Operation aborted."
     exit 1
   fi
+  echo "Continuing with PostgreSQL $psql_version..."
 fi
 
 # Export password for authentication
