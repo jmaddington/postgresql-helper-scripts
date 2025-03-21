@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# Update package list
+apt-get update
+apt-get install -y apt-utils
+
+echo "If you see a message: "
+echo "debconf: delaying package configuration, since apt-utils is not installed"
+echo "ctrl+c and run the script again."
+
+# Install wget if not installed
+if ! command -v wget &> /dev/null; then
+    apt-get install -y wget
+fi
+
+# Install gnupg if not installed
+if ! command -v gpg &> /dev/null; then
+    apt-get install -y gnupg
+fi
+
+# Install lsb-release if not installed
+if ! command -v lsb_release &> /dev/null; then
+    apt-get install -y lsb-release
+fi
+
+# Add PostgreSQL repository and its key
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /usr/share/keyrings/postgresql.gpg
+echo "deb [signed-by=/usr/share/keyrings/postgresql.gpg] http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | tee /etc/apt/sources.list.d/pgdg.list
+
+# Update package list with the new repository
+apt-get update
+
+# Install PostgreSQL 16
+apt-get install -y postgresql-16
+
+# Check if installation was successful
+psql_version=$(psql -V 2>&1 | grep -o '[0-9]*\.[0-9]*' | head -1)
+if [[ "$psql_version" != "16"* ]]; then
+    echo "Failed to install PostgreSQL 16."
+    exit 1
+else
+  echo "PostgreSQL 16 installed successfully."
+fi
